@@ -1,0 +1,45 @@
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+
+# Define the URL
+url = "https://results.eci.gov.in"
+
+# Send a GET request
+response = requests.get(url)
+soup = BeautifulSoup(response.content, 'html.parser')
+
+# Extract relevant data (this is an example, actual implementation may vary)
+data = []
+for row in soup.find_all('tr'):
+    cells = row.find_all('td')
+    data.append([cell.text.strip() for cell in cells])
+
+# Convert to DataFrame
+df = pd.DataFrame(data)
+
+# Example analysis: Party-wise seat count
+party_seat_counts = df['Party'].value_counts()
+
+# Example analysis: Top performing constituencies
+top_constituencies = df.nlargest(10, 'Votes')
+
+# More analysis as needed
+
+# Example report generation
+report = """
+Lok Sabha Election Results Analysis
+
+1. Party-wise Seat Distribution:
+{party_seat_counts}
+
+2. Top Performing Constituencies:
+{top_constituencies}
+
+... (8 more insights)
+"""
+
+# Save report to file
+with open("lok_sabha_election_report.txt", "w") as file:
+    file.write(report.format(party_seat_counts=party_seat_counts, top_constituencies=top_constituencies))
+
